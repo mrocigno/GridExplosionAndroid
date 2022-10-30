@@ -1,16 +1,9 @@
 package br.com.mrocigno.gridexplosion
 
-import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
@@ -25,6 +18,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             setOnTouchListener { _, event ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
+                        startAnimation(event)
+                    }
+                    MotionEvent.ACTION_MOVE -> {
                         startAnimation(event)
                     }
                     MotionEvent.ACTION_UP -> {

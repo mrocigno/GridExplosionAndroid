@@ -7,14 +7,18 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Paint
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.core.animation.doOnStart
 import androidx.core.graphics.ColorUtils
+import androidx.core.os.bundleOf
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import java.util.*
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class ExplosionLayout @JvmOverloads constructor(
@@ -54,14 +58,17 @@ class ExplosionLayout @JvmOverloads constructor(
         super.onLayout(changed, left, top, right, bottom)
 
         if (changed) {
-            val numLines = (mHeight / pixelSize).roundToInt()
-            val numColumns = (mWidth / pixelSize).roundToInt()
+            val numLines = ceil(mHeight / pixelSize).roundToInt()
+            val numColumns = ceil(mWidth / pixelSize).roundToInt()
             pixels = List(numLines) { line ->
                 List(numColumns) { column ->
-                    PixelModel(line, column)
+                    PixelModel(
+                        line,
+                        column,
+                        colors[currentColor]
+                    )
                 }
             }
-
         }
     }
 
@@ -73,7 +80,7 @@ class ExplosionLayout @JvmOverloads constructor(
     }
 
     fun startAnimation(center: Pair<Int, Int>) {
-        val color = colors.getOrNull(currentColor++) ?: let {
+        val color = colors.getOrNull(++currentColor) ?: let {
             currentColor = 1
             colors.first()
         }
@@ -110,6 +117,19 @@ class ExplosionLayout @JvmOverloads constructor(
                 }
             }
         }
+    }
+
+    override fun onSaveInstanceState() = bundleOf(
+        "superState" to super.onSaveInstanceState(),
+        "currentColor" to currentColor
+    )
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        val data = if (state is Bundle) {
+            currentColor = state.getInt("currentColor")
+            state.getParcelable("superState")
+        } else state
+        super.onRestoreInstanceState(data)
     }
 }
 
